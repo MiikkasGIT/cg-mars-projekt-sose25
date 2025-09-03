@@ -9,6 +9,8 @@
 #include "Model.h"
 #include "phongshader.h"
 #include <list>
+#include <float.h>
+#include <sstream>
 
 Model::Model() : pMeshes(NULL), MeshCount(0), pMaterials(NULL), MaterialCount(0)
 {
@@ -16,13 +18,17 @@ Model::Model() : pMeshes(NULL), MeshCount(0), pMaterials(NULL), MaterialCount(0)
 }
 Model::Model(const char* ModelFile, bool FitSize) : pMeshes(NULL), MeshCount(0), pMaterials(NULL), MaterialCount(0)
 {
-    bool ret = load(ModelFile, FitSize);
+    bool ret = load(ModelFile);
     if(!ret)
         throw std::exception();
 }
 Model::~Model()
 {
-	// TODO: Add your code (Exercise 3)
+    if (pMeshes != nullptr) {
+        delete[] pMeshes;
+    }
+    delete[] pMaterials;
+
     deleteNodes(&RootNode);
 }
 
@@ -60,17 +66,157 @@ bool Model::load(const char* ModelFile, bool FitSize)
     return true;
 }
 
+
+Vector Model::createVector(const aiVector3D& old) {
+    return Vector(old.x, old.y, old.z);
+}
+
 void Model::loadMeshes(const aiScene* pScene, bool FitSize)
 {
-	// TODO: Add your code (Exercise 3) 
+    if (pMeshes != nullptr) delete pMeshes;
+
+    this->MeshCount = pScene->mNumMeshes;
+    pMeshes = new Mesh[MeshCount];
+
+    this->calcBoundingBox(pScene, BoundingBox);
+
+    float scale = 1;
+   
+
+    // warum durch 2 nochmal ????????????????????????????
+    //max minus min nehmen eigentlich
+    if (FitSize) {
+        Vector bBMax = BoundingBox.Max;
+        Vector bBMin = BoundingBox.Min;
+
+        float x = fmax(bBMax.X, abs(bBMin.X));
+        float y = fmax(bBMax.Y, abs(bBMin.Y));
+        float z = fmax(bBMax.Z, abs(bBMin.Z));
+
+        float maxDist = fmax(fmax(x, y), z);
+        scale = 5.0f / 2.0f / maxDist;
+    }
+
+    //Durch alle Meshes gehen
+    for (int i = 0; i < MeshCount; i++) {
+        //temporäre Variablen für die übersichtlichkeit
+        aiMesh* tmpAIMesh = pScene->mMeshes[i];
+        VertexBuffer* tmpVB = &pMeshes[i].VB;
+
+        //Vertices des Meshes in den Vertexbuffer schreiben
+        tmpVB->begin();
+        for (int posVer = 0; posVer < tmpAIMesh->mNumVertices; posVer++) {
+            //Normale umgewandelt in den Vertexbuffer schreiben
+            tmpVB->addNormal(createVector(tmpAIMesh->mNormals[posVer]));
+
+            //Texturkoordinaten in den Vertexbuffer schreiben
+            for (int posTex = 0; posTex < 4; posTex++) {
+                if (tmpAIMesh->HasTextureCoords(posTex)) {
+                    Vector tmp = createVector(tmpAIMesh->mTextureCoords[posTex][posVer]);
+                    switch (posTex)
+                    {
+                    case 0:
+                        tmpVB->addTexcoord0(tmp.X, -tmp.Y, tmp.Z);
+                        break;
+                    case 1:
+                        tmpVB->addTexcoord1(tmp.X, -tmp.Y, tmp.Z);
+                        break;
+                    case 2:
+                        tmpVB->addTexcoord2(tmp.X, -tmp.Y, tmp.Z);
+                        break;
+                    case 3:
+                        tmpVB->addTexcoord3(tmp.X, -tmp.Y, tmp.Z);
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+
+            //Vertex hinzufügen
+            tmpVB->addVertex(createVector(tmpAIMesh->mVertices[posVer]) * scale);
+
+        }
+        tmpVB->end();
+
+        IndexBuffer* tmpIB = &pMeshes[i].IB;
+        tmpIB->begin();
+        //Indexbuffer füllen, durch Alle Flächen durchgehen indicies speichern
+        for (int pos = 0; pos < tmpAIMesh->mNumFaces; pos++) {
+            //temp Face für übersichtlichkeit
+            aiFace tmpAiFace = tmpAIMesh->mFaces[pos];
+            for (int ind = 0; ind < tmpAiFace.mNumIndices; ind++) {
+                tmpIB->addIndex(tmpAiFace.mIndices[ind]);
+            }
+        }
+        tmpIB->end();
+
+        pMeshes[i].MaterialIdx = tmpAIMesh->mMaterialIndex;
+    }
 }
+
+
+
+
 void Model::loadMaterials(const aiScene* pScene)
 {
-	// TODO: Add your code (Exercise 3)
+    MaterialCount = pScene->mNumMaterials;
+    pMaterials = new Material[MaterialCount];
+
+    for (int pos = 0; pos < MaterialCount; pos++) {
+        aiMaterial* tmpMat = pScene->mMaterials[pos];
+        aiColor3D tmpColor;
+
+        this->pMaterials[pos].DiffTex = Texture::defaultTex();
+
+        for (int j = 0; j < tmpMat->GetTextureCount(aiTextureType_DIFFUSE); j++) {
+            aiString path;
+            std::string fileFullPathDiffTex;
+            tmpMat->GetTexture(aiTextureType_DIFFUSE, j, &path);
+
+            std::stringstream ss;
+            ss << Path << path.data << std::ends;
+            fileFullPathDiffTex = ss.str();
+            this->pMaterials[pos].DiffTex = Texture::LoadShared(fileFullPathDiffTex.c_str());
+        }
+
+        tmpMat->Get(AI_MATKEY_COLOR_AMBIENT, tmpColor);
+        pMaterials[pos].AmbColor = createColor(tmpColor);
+
+        tmpMat->Get(AI_MATKEY_COLOR_DIFFUSE, tmpColor);
+        pMaterials[pos].DiffColor = createColor(tmpColor);
+
+        tmpMat->Get(AI_MATKEY_COLOR_SPECULAR, tmpColor);
+        pMaterials[pos].SpecColor = createColor(tmpColor);
+
+        float shiny = 0.0f;
+        tmpMat->Get(AI_MATKEY_SHININESS, shiny);
+        pMaterials[pos].SpecExp = shiny;
+
+    }
 }
+
+Color Model::createColor(const aiColor3D& old) {
+    return Color(old.r, old.g, old.b);
+}
+
 void Model::calcBoundingBox(const aiScene* pScene, AABB& Box)
 {
-	// TODO: Add your code (Exercise 3)
+    Vector min(0.0f, 0.0f, 0.0f);
+    Vector max(0.0f, 0.0f, 0.0f);
+
+    for (int i = 0; i < pScene->mNumMeshes; i++) {
+        for (int j = 0; j < pScene->mMeshes[i]->mNumVertices;j++) {
+            if (pScene->mMeshes[i]->mVertices[j].x < min.X) min.X = pScene->mMeshes[i]->mVertices[j].x;
+            if (pScene->mMeshes[i]->mVertices[j].y < min.Y) min.Y = pScene->mMeshes[i]->mVertices[j].y;
+            if (pScene->mMeshes[i]->mVertices[j].z < min.Z) min.Z = pScene->mMeshes[i]->mVertices[j].z;
+            if (pScene->mMeshes[i]->mVertices[j].x > max.X) max.X = pScene->mMeshes[i]->mVertices[j].x;
+            if (pScene->mMeshes[i]->mVertices[j].y > max.Y) max.Y = pScene->mMeshes[i]->mVertices[j].y;
+            if (pScene->mMeshes[i]->mVertices[j].z > max.Z) max.Z = pScene->mMeshes[i]->mVertices[j].z;
+        }
+    }
+    Box.Max = max;
+    Box.Min = min;
 }
 
 void Model::loadNodes(const aiScene* pScene)
@@ -171,6 +317,5 @@ Matrix Model::convert(const aiMatrix4x4& m)
                   m.c1, m.c2, m.c3, m.c4,
                   m.d1, m.d2, m.d3, m.d4);
 }
-
 
 

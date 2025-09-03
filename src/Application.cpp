@@ -37,18 +37,7 @@ Application::Application(GLFWwindow* pWin) : pWindow(pWin), Cam(pWin)
 {
     BaseModel* pModel;
     
-    // create LineGrid model with constant color shader
-    pModel = new LinePlaneModel(10, 10, 10, 10);
-    ConstantShader* pConstShader = new ConstantShader();
-	pConstShader->color( Color(1,0,0));
-    pModel->shader(pConstShader, true);
-    // add to render list
-    Models.push_back( pModel );
-    
-    // Exercise 1
-    // uncomment the following lines for testing
-    
-    /*
+    //Skybox
     pModel = new Model(ASSET_DIRECTORY "skybox.obj", false);
     pModel->shader(new PhongShader(), true);
     Models.push_back(pModel);
@@ -62,7 +51,7 @@ Application::Application(GLFWwindow* pWin) : pWindow(pWin), Cam(pWin)
     pTerrain->depth(150);
     pTerrain->height(15);
     Models.push_back(pTerrain);
-    */
+    
     
 }
 void Application::start()
