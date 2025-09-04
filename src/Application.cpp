@@ -36,7 +36,7 @@
 Application::Application(GLFWwindow* pWin) : pWindow(pWin), Cam(pWin)
 {
     BaseModel* pModel;
-    
+    Cam.setPosition(Vector(0.0f, 40.0f, 120.0f));
     //Skybox
     pModel = new Model(ASSET_DIRECTORY "skybox.obj", false);
     pModel->shader(new PhongShader(), true);
@@ -44,11 +44,9 @@ Application::Application(GLFWwindow* pWin) : pWindow(pWin), Cam(pWin)
    
     // --- Terrain ---
     Terrain* pTerrainLocal = new Terrain(
-        ASSET_DIRECTORY "texture/mars_regolith_detail.png",
-        ASSET_DIRECTORY "texture/mars_rock_detail.png"
+        ASSET_DIRECTORY "mars_regolith_detail.png",
+        ASSET_DIRECTORY "mars_rock_detail.png"
     );
-    TerrainShader* pTerrainShader = new TerrainShader(ASSET_DIRECTORY);
-    pTerrainLocal->shader(pTerrainShader, true);
 
     const int   gridSize     = 513;
     const float roughness    = 0.66f;
@@ -59,6 +57,10 @@ Application::Application(GLFWwindow* pWin) : pWindow(pWin), Cam(pWin)
 
     bool ok = pTerrainLocal->generateDiamondSquare(gridSize, roughness, seed,
                                                    worldScale, heightScale, wrapEdges);
+    TerrainShader* pTerrainShader = new TerrainShader(ASSET_DIRECTORY);
+    pTerrainLocal->shader(pTerrainShader, /*deleteOnDestruction*/ true);
+    pTerrainShader->setK(12);          // <<< WICHTIG: kein 0!
+    pTerrainShader->scaling(Vector(1,1,1));
     assert(ok);
 
     {   // Terrain in die Mitte legen
@@ -67,13 +69,6 @@ Application::Application(GLFWwindow* pWin) : pWindow(pWin), Cam(pWin)
         Matrix t; t.translation(Vector(-halfX, 0.0f, -halfZ));
         pTerrainLocal->transform(t * pTerrainLocal->transform());
     }
-
-    pTerrainShader->useMixTex(true);
-    pTerrainShader->setTriplanar(0.08f, 4.0f);
-    pTerrainShader->setRock(0.45f, 0.12f);
-    pTerrainShader->setTint(Vector(1.06f, 0.95f, 0.90f));
-    pTerrainShader->setFog(80.0f, 300.0f, Vector(0.95f, 0.95f, 1.0f));
-
     Models.push_back(pTerrainLocal);
     pTerrain = pTerrainLocal;
 
@@ -91,9 +86,6 @@ void Application::start()
 
 void Application::update(float dtime)
 {
-    // Exercise 1
-    // TODO: Add keyboard & mouse input queries for terrain scaling ..
-    
     Cam.update();
 }
 

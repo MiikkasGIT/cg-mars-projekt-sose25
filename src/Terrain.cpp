@@ -306,8 +306,6 @@ void Terrain::applyShaderParameter()
     TerrainShader* Shader = dynamic_cast<TerrainShader*>(BaseModel::shader());
     if(!Shader) return;
 
-    // MixTex ist optional – dein Shader sollte auf „kein Mix“ fallbacken,
-    // falls keine Textur gesetzt ist.
     Shader->mixTex(&MixTex);
     for(int i=0; i<2; i++)
         Shader->detailTex(i,&DetailTex[i]);

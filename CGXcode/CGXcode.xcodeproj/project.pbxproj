@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7058A6E02E689E8D001F209B /* Drone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7058A6DF2E689E8B001F209B /* Drone.cpp */; };
 		7A01EEF51DC9EA78002FE604 /* Aabb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A01EEF31DC9EA78002FE604 /* Aabb.cpp */; };
 		7A29D90A1DABA6460028612B /* Application.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A29D8ED1DABA6450028612B /* Application.cpp */; };
 		7A29D90B1DABA6460028612B /* BaseModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A29D8EF1DABA6450028612B /* BaseModel.cpp */; };
@@ -53,8 +52,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		7058A6DE2E689E82001F209B /* Drone.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Drone.h; sourceTree = "<group>"; };
-		7058A6DF2E689E8B001F209B /* Drone.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Drone.cpp; sourceTree = "<group>"; };
 		7A01EEF31DC9EA78002FE604 /* Aabb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Aabb.cpp; path = ../../src/Aabb.cpp; sourceTree = "<group>"; };
 		7A01EEF41DC9EA78002FE604 /* Aabb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Aabb.h; path = ../../src/Aabb.h; sourceTree = "<group>"; };
 		7A29D8ED1DABA6450028612B /* Application.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Application.cpp; path = ../../src/Application.cpp; sourceTree = "<group>"; };
@@ -151,8 +148,6 @@
 		7A29D9191DABA6800028612B /* models */ = {
 			isa = PBXGroup;
 			children = (
-				7058A6DF2E689E8B001F209B /* Drone.cpp */,
-				7058A6DE2E689E82001F209B /* Drone.h */,
 				7A29D8FE1DABA6460028612B /* Model.cpp */,
 				7A29D8FF1DABA6460028612B /* Model.h */,
 				7A29D8FA1DABA6460028612B /* LinePlaneModel.cpp */,
@@ -296,7 +291,6 @@
 			files = (
 				7A4985A81DEEC44A00C7D957 /* TerrainShader.cpp in Sources */,
 				7A29D9141DABA6460028612B /* Texture.cpp in Sources */,
-				7058A6E02E689E8D001F209B /* Drone.cpp in Sources */,
 				7A29D9111DABA6460028612B /* Matrix.cpp in Sources */,
 				7A29D9121DABA6460028612B /* Model.cpp in Sources */,
 				7A29D90F1DABA6460028612B /* IndexBuffer.cpp in Sources */,

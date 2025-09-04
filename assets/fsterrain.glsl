@@ -11,6 +11,8 @@ uniform sampler2D MixTex; // for exercise 3
 uniform sampler2D DetailTex[2]; // for exercise 3
 uniform vec3 Scaling;
 
+uniform int k;
+
 in vec3 Position;
 in vec3 Normal;
 in vec2 Texcoord;
@@ -36,6 +38,14 @@ void main()
     
     // Exercise 3
     // TODO: Add texture blending code here..
+
+    vec4 mixTexColor = texture(MixTex, Texcoord);
+    vec4 grassTexColor = texture(DetailTex[0], Texcoord*k);
+    vec4 rockTextColor = texture(DetailTex[1], Texcoord*k);
+
+    vec4 interpolation = mix(grassTexColor, rockTextColor, mixTexColor);
+
+ 
     
-    FragColor = vec4(((DiffuseComponent + AmbientColor) + SpecularComponent),1);
+    FragColor = interpolation * vec4(((DiffuseComponent + AmbientColor) + SpecularComponent),1);
 }
