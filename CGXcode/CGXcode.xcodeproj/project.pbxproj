@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7058A6E52E69A4B2001F209B /* Item.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7058A6E42E69A4B2001F209B /* Item.cpp */; };
+		7058A6E62E69A4B2001F209B /* Drone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7058A6E22E69A4B2001F209B /* Drone.cpp */; };
 		7A01EEF51DC9EA78002FE604 /* Aabb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A01EEF31DC9EA78002FE604 /* Aabb.cpp */; };
 		7A29D90A1DABA6460028612B /* Application.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A29D8ED1DABA6450028612B /* Application.cpp */; };
 		7A29D90B1DABA6460028612B /* BaseModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7A29D8EF1DABA6450028612B /* BaseModel.cpp */; };
@@ -52,6 +54,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7058A6E12E69A4B2001F209B /* Drone.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Drone.h; path = ../src/Drone.h; sourceTree = SOURCE_ROOT; };
+		7058A6E22E69A4B2001F209B /* Drone.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Drone.cpp; path = ../src/Drone.cpp; sourceTree = SOURCE_ROOT; };
+		7058A6E32E69A4B2001F209B /* Item.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Item.h; path = ../src/Item.h; sourceTree = SOURCE_ROOT; };
+		7058A6E42E69A4B2001F209B /* Item.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Item.cpp; path = ../src/Item.cpp; sourceTree = SOURCE_ROOT; };
 		7A01EEF31DC9EA78002FE604 /* Aabb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Aabb.cpp; path = ../../src/Aabb.cpp; sourceTree = "<group>"; };
 		7A01EEF41DC9EA78002FE604 /* Aabb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Aabb.h; path = ../../src/Aabb.h; sourceTree = "<group>"; };
 		7A29D8ED1DABA6450028612B /* Application.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Application.cpp; path = ../../src/Application.cpp; sourceTree = "<group>"; };
@@ -148,6 +154,10 @@
 		7A29D9191DABA6800028612B /* models */ = {
 			isa = PBXGroup;
 			children = (
+				7058A6E12E69A4B2001F209B /* Drone.h */,
+				7058A6E22E69A4B2001F209B /* Drone.cpp */,
+				7058A6E32E69A4B2001F209B /* Item.h */,
+				7058A6E42E69A4B2001F209B /* Item.cpp */,
 				7A29D8FE1DABA6460028612B /* Model.cpp */,
 				7A29D8FF1DABA6460028612B /* Model.h */,
 				7A29D8FA1DABA6460028612B /* LinePlaneModel.cpp */,
@@ -307,6 +317,8 @@
 				7A29D90D1DABA6460028612B /* Camera.cpp in Sources */,
 				7A4985A51DEDB7EA00C7D957 /* Terrain.cpp in Sources */,
 				7A01EEF51DC9EA78002FE604 /* Aabb.cpp in Sources */,
+				7058A6E52E69A4B2001F209B /* Item.cpp in Sources */,
+				7058A6E62E69A4B2001F209B /* Drone.cpp in Sources */,
 				7ABD81881DA3C8EA0008D349 /* rgbimage.cpp in Sources */,
 				7ABD81891DA3C8EA0008D349 /* vector.cpp in Sources */,
 				7A29D90E1DABA6460028612B /* ConstantShader.cpp in Sources */,

@@ -15,9 +15,10 @@ Drone::Drone(const std::string& assetDir)
     const float kModelScale = 0.01f;
     Matrix S; S.scale(kModelScale);
     this->transform(S * this->transform());
+    m_ScaleM = S;   // speichern
 
     // 2) AABB EXPLIZIT mitskalieren (wichtig!)
-    AABB aabb = this->BoundingBox; // i.d.R. Mesh-Space-AABB, nicht auto-updated
+    AABB aabb = this->BoundingBox; // Mesh-Space-AABB
     aabb.transform(S);
 
     // 3) Erst jetzt übernehmen
@@ -210,6 +211,7 @@ void Drone::rebuildTransform()
     tiltX.rotationX(m_TiltX);
     tiltZ.rotationZ(m_TiltZ);
 
-    this->transform(T * R * (tiltX * tiltZ));
+    this->transform(T * R * (tiltX * tiltZ) * m_ScaleM);
+
     m_Dirty = false;
 }

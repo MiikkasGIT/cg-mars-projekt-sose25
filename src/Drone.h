@@ -70,7 +70,7 @@ private:
     float  m_BoostDecaySpeed   = 3.0f;
     float  m_BoostOffset       = 0.0f;
     bool   m_BoostActive       = false;
-
+    Matrix m_ScaleM;
     // AABBs
     AABB   m_LocalAABB; // Modelspace
     AABB   m_WorldAABB; // Weltspace (wird bewegt)

@@ -18,6 +18,7 @@
 #include "indexbuffer.h"
 #include "basemodel.h"
 #include "terrain.h"
+#include "Drone.h"
 
 class Application
 {
@@ -34,6 +35,8 @@ protected:
     ModelList Models;
     GLFWwindow* pWindow;
     Terrain* pTerrain;
+    Drone* playerDrone;
+    BaseModel*  skybox; 
 };
 
 #endif /* Application_hpp */
