@@ -34,6 +34,7 @@ Drone::Drone(const std::string& assetDir)
 }
 
 Drone::~Drone() {}
+
 static void dbg(const std::string& msg) {
     std::cout << "[Drone] " << msg << std::endl;
 }
@@ -174,6 +175,28 @@ float Drone::desiredBottomYFromTerrain(const AABB& wbox, const Terrain* t) const
     return groundY + m_BaseHoverHeight + m_BoostOffset;
 }
 
+// rotiert XZ um yaw
+static inline Vector rotYaw(const Vector& v, float yaw) {
+    float c = cosf(yaw), s = sinf(yaw);
+    return { v.X * c + v.Z * s, v.Y, -v.X * s + v.Z * c };
+}
+
+// MAX( Terrainhöhe ) an 4 Ecken + Mitte (Fußabdruck)
+float Drone::maxGroundUnder(const AABB& wbox, const Terrain* t, float yaw) const {
+    const Vector c = wbox.getCenter();
+    const Vector sz = wbox.size();             // AABB im Welt­raum
+    const float rx = 0.5f * sz.X, rz = 0.5f * sz.Z;
+
+    const Vector pts[5] = { {+rx,0,+rz},{-rx,0,+rz},{+rx,0,-rz},{-rx,0,-rz},{0,0,0} };
+    float hmax = -FLT_MAX;
+    for (auto& pLocal : pts) {
+        Vector p = c + rotYaw(pLocal, yaw);
+        float h = sampleGroundAt(p.X, p.Z, t);
+        if (h > hmax) hmax = h;
+    }
+    return hmax;
+}
+
 void Drone::update(float dt, Terrain* terrain)
 {
     // Boost abbauen
@@ -182,17 +205,27 @@ void Drone::update(float dt, Terrain* terrain)
         if (m_BoostOffset <= 0.0f) { m_BoostOffset = 0.0f; m_BoostActive = false; }
     }
 
-    // sanftes Nachführen auf Hover-Zielhöhe
-    if (terrain) {
-        const float targetBottomY  = desiredBottomYFromTerrain(m_WorldAABB, terrain);
-        const float currentBottomY = m_WorldAABB.getCenterBottom().Y;
-        float dy = (targetBottomY - currentBottomY) * m_HeightFollowSpeed * dt;
+    if (m_BoostActive) {
+        m_BoostOffset = std::max(0.0f, m_BoostOffset - m_BoostDecaySpeed * dt);
+        if (m_BoostOffset == 0) m_BoostActive = false;
+    }
 
-        const float maxStep = 20.0f * dt; // „Dämpfer“ gegen harte Sprünge
-        dy = clampv(dy, -maxStep, maxStep);
+    if (terrain) {
+        const float groundMax = maxGroundUnder(m_WorldAABB, terrain, m_Yaw);
+        const float currentBotY = m_WorldAABB.getCenterBottom().Y;
+        const float targetBotY = groundMax + m_BaseHoverHeight + m_BoostOffset;
+
+        float dy;
+        if (currentBotY < groundMax)               // sofort rausdrücken (kein Clipping)
+            dy = groundMax - currentBotY;
+        else {                                     // weich zur Zielhöhe (kritisch gedämpft)
+            const float alpha = 1.0f - expf(-dt / 0.20f);   // ~200 ms
+            dy = (targetBotY - currentBotY) * alpha;
+            dy = clampv(dy, -20.0f * dt, 20.0f * dt);           // optional: harte Kappung
+        }
 
         if (fabsf(dy) > 1e-5f) {
-            Matrix M; M.translation(Vector(0, dy, 0));
+            Matrix M; M.translation({ 0, dy, 0 });
             m_WorldAABB.transform(M);
             m_Dirty = true;
         }

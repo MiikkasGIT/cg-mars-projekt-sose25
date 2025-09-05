@@ -23,6 +23,7 @@ public:
 
     // Steuerung / Simulation
     void handleInput(GLFWwindow* win, float dt);
+    float maxGroundUnder(const AABB& wbox, const Terrain* t, float yaw) const;
     void update(float dt, Terrain* terrain);
 
     // API
