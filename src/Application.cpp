@@ -69,6 +69,8 @@ Application::Application(GLFWwindow* pWin) : pWindow(pWin), Cam(pWin)
         const float halfZ = (gridSize - 1) * worldScale * 0.5f;
         Matrix t; t.translation(Vector(-halfX, 0.0f, -halfZ));
         pTerrainLocal->transform(t * pTerrainLocal->transform());
+        Models.push_back(pTerrainLocal);
+        pTerrain = pTerrainLocal;
     }
     // --- Drone ---
     playerDrone = new Drone(ASSET_DIRECTORY);
@@ -88,9 +90,6 @@ Application::Application(GLFWwindow* pWin) : pWindow(pWin), Cam(pWin)
         Cam.setTarget(camTarget + fwd * 5.0f);
         Cam.setFOV(65.0f);
     }
-    
-    Models.push_back(pTerrainLocal);
-    pTerrain = pTerrainLocal;
 
     
 }
