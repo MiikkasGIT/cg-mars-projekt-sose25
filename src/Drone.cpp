@@ -3,35 +3,50 @@
 #include "texture.h"
 #include "Terrain.h"
 
+
 template <typename T>
 static inline T clampv(T v, T lo, T hi) { return (v < lo) ? lo : (v > hi) ? hi : v; }
 
 Drone::Drone(const std::string& assetDir)
-: Model((assetDir + "models/Drone.FBX").c_str(), true)
+    : Model((assetDir + "models/Drone.FBX").c_str(), true)
 {
     this->shader(new PhongShader(), true);
 
-    // 1) FBX von cm auf m skalieren
+    // 1) Skalierung FBX von cm → m
     const float kModelScale = 0.01f;
     Matrix S; S.scale(kModelScale);
     this->transform(S * this->transform());
-    m_ScaleM = S;   // speichern
+    m_ScaleM = S;
 
-    // 2) AABB EXPLIZIT mitskalieren (wichtig!)
-    AABB aabb = this->BoundingBox; // Mesh-Space-AABB
+    // 2) AABB mitskalieren
+    AABB aabb = this->BoundingBox;
     aabb.transform(S);
 
-    // 3) Erst jetzt übernehmen
     m_LocalAABB = aabb;
     m_WorldAABB = m_LocalAABB;
     m_WorldAABB.type = kDroneType;
 
     Vector sz = m_LocalAABB.size();
     std::cout << "[Drone] AABB size (after scale) = ("
-              << sz.X << ", " << sz.Y << ", " << sz.Z << ")\n";
+        << sz.X << ", " << sz.Y << ", " << sz.Z << ")\n";
+
+    // 3) Textur aus eigenem Pfad laden
+    const std::string texturePath = assetDir + "models/textures/Drone_diff.jpeg";
+    const Texture* diffuseTex = Texture::LoadShared(texturePath.c_str());
+
+    // 4) Shader setzen
+    PhongShader* phong = dynamic_cast<PhongShader*>(this->shader());
+    if (phong) {
+        if (diffuseTex) {
+            phong->diffuseTexture(diffuseTex);
+        }
+    }
 
     rebuildTransform();
 }
+
+
+
 
 Drone::~Drone() {}
 
